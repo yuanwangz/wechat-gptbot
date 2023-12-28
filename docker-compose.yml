@@ -4,6 +4,8 @@ services:
   wechat-service:
     image: henryxiaoyang/xybotwechat
     container_name: wechat-service
+	depends_on:
+	  - wechat-gpt-hook
     volumes:
       - ./assets:/home/app/upload
       - ./assets/auto.dll:/home/app/.wine/drive_c/injector/auto.dll
@@ -23,10 +25,8 @@ services:
   wechat-gpt-hook:
     image: yuanwangz/wechat-gpt-hook:latest
     container_name: wechat-gpt-hook
-    depends_on:
-      - wechat-service
     command: >
-      sh -c "mkdir ./assets && cp ./assets/auto.dll /app/assets/auto.dll"
+      sh -c "mkdir ./assets && cp /app/assets/auto.dll ./assets/auto.dll"
     volumes:
       - ./assets:/app/assets
     environment:
@@ -37,3 +37,4 @@ services:
       - CREATE_IMAGE_STYLE=natural
       - SINGLE_CHAT_PREFIX=["bot","@bot"]
       - ROLE_DESC=你是ChatGPT, 一个由OpenAI训练的大型语言模型, 你旨在回答并解决人们的任何问题，并且可以使用多种语言与人交流。
+	  

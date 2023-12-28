@@ -79,9 +79,9 @@ def send_txt(msg, wx_id):
 
 
 def send_image(img_path, wx_id):
-    logger.info(f"图片路径：{img_path}")
     file_name = os.path.basename(img_path)
     send_path = r"C:\\users\\app\\Pictures\\upload\\" + file_name
+    logger.info(f"图片路径：{send_path}")
     path = "api/sendpic"
     data = {
         "type": MessageType.PIC_MSG.value,

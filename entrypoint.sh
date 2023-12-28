@@ -13,6 +13,7 @@ echo "{
   \"proxy\": \"${PROXY:-}\",
   \"create_image_prefix\": ${CREATE_IMAGE_PREFIX:-[\"画\", \"看\", \"找\"]},
   \"create_image_model\": \"${CREATE_IMAGE_MODEL:-dall-e-3}\",
+  \"file_dir'": \"${FILE_DIR:-C:\\users\\app\\Pictures\\upload\\}\",
   \"create_image_size\": \"${CREATE_IMAGE_SIZE:-1024x1024}\",
   \"create_image_style\": \"${CREATE_IMAGE_STYLE:-vivid}\",
   \"create_image_quality\": \"${CREATE_IMAGE_QUALITY:-hd}\",

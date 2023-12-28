@@ -11,6 +11,7 @@
   "proxy": "",
   "create_image_prefix": ["draw", "paint", "imagine"],
   "create_image_model": "dall-e-3",
+  "file_dir": "C:\\users\\app\\Pictures\\upload\\",
   "create_image_size": "1024x1024",  
   "create_image_style": "vivid",
   "create_image_quality": "hd",	

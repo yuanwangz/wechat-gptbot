@@ -21,7 +21,7 @@ services:
       - "dldir1.qq.com:127.0.0.1"
 
   wechat-gpt-hook:
-    image: wechat-gpt-hook:latest
+    image: yuanwangz/wechat-gpt-hook:latest
     container_name: wechat-gpt-hook
     depends_on:
       - wechat-service

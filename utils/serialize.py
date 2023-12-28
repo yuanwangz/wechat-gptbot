@@ -18,23 +18,23 @@ def serialize_video(video_url: str) -> str:
 
 def serialize_file(file_url: str, suffix: str) -> str:
     try:
-        # download file
+        # 下载文件
         path = os.path.abspath("./assets")
-        file_name = int(time.time() * 1000)
+        file_name = str(int(time.time() * 1000))
         response = requests.get(file_url, stream=True)
-        response.raise_for_status()  # Raise exception if invalid response
+        response.raise_for_status()  # 如果响应无效，则抛出异常
 
-        with open(f"{path}\\{file_name}.{suffix}", "wb+") as f:
+        file_path = os.path.join(path, f"{file_name}.{suffix}")
+        with open(file_path, "wb+") as f:
             for chunk in response.iter_content(chunk_size=8192):
-                if chunk:  # filter out keep-alive new chunks
+                if chunk:  # 过滤掉保持连接的新块
                     f.write(chunk)
-            f.close()
-        img_path = os.path.abspath(f"{path}\\{file_name}.{suffix}").replace(
-            "\\", "\\\\"
-        )
+
+        img_path = os.path.abspath(file_path)
         return img_path
     except Exception as e:
         logger.error(f"[Download File Error]: {e}")
+        return ""
 
 
 def serialize_text(text: str, msg: Message) -> str:

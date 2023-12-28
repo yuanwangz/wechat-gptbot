@@ -4,6 +4,30 @@ from utils.log import logger
 from common.session import Session
 from common.reply import Reply, ReplyType
 from common.context import ContextType, Context
+import re
+
+
+def process_message(msg):
+    # 移除包含特定关键词的Markdown代码块
+    cleaned_msg = re.sub(r'```[\s\S]*?(prompt|search\(|mclick\()[\s\S]*?```', '', msg)
+
+    # 提取并下载图片
+    image_regex = re.compile(r'!\[image]\((.*?)\)')
+    matches = image_regex.findall(cleaned_msg)
+    # 检查是否有找到图片链接
+    if len(matches) > 0:
+        # 有图片链接时，返回 imgflag=1 和第一个图片链接
+        return 1, matches[0]
+    else:
+        # 没有图片链接时，返回 imgflag=0 和清理后的消息
+        # 移除包含 ![image] 的行和前后的空白行
+        cleaned_msg = re.sub(r'^\s*.*!\[image\].*\n', '', cleaned_msg, flags=re.MULTILINE)
+        # 移除包含 [下载链接] 的行和前后的空白行
+        cleaned_msg = re.sub(r'^\s*.*\[下载链接\].*\n', '', cleaned_msg, flags=re.MULTILINE)
+        cleaned_msg = re.sub(r'^\s*\n+', '', cleaned_msg)
+        cleaned_msg = re.sub(r'\[\[\d+\]\(https?:\/\/[^\]]+\)\]', '', cleaned_msg)
+
+    return 0, cleaned_msg
 
 
 class ChatGPTBot:
@@ -35,17 +59,23 @@ class ChatGPTBot:
                 Session.save_session(
                     response["content"], session_id, response["total_tokens"]
                 )
-            return Reply(ReplyType.TEXT, response["content"])
+            img_flag, reply_content = process_message(response["content"])
+            if img_flag == 1:
+                reply = Reply(ReplyType.IMAGE, reply_content)
+            else:
+                reply = Reply(ReplyType.TEXT, reply_content)
+
+            return reply
 
     def reply_img(self, query) -> Reply:
         create_image_size = conf().get("create_image_size", "512x512")
         create_image_model = conf().get("create_image_model", "dall-e-3")
         create_image_style = conf().get("create_image_style", "vivid")
         create_image_quality = conf().get("create_image_quality", "standard")
-        
+
         try:
             response = openai.Image.create(prompt=query, model=create_image_model, n=1, size=create_image_size,
-                style=create_image_style, quality=create_image_quality)
+                                           style=create_image_style, quality=create_image_quality)
             image_url = response["data"][0]["url"]
             logger.info(f"[{self.name}] Image={image_url}")
             return Reply(ReplyType.IMAGE, image_url)

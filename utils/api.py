@@ -4,6 +4,9 @@ import requests
 import json
 from utils.log import logger
 from utils.const import MessageType
+from config import conf
+import os
+import threading
 
 
 def fetch(path, data):
@@ -17,7 +20,8 @@ def fetch(path, data):
         "ext": "null",
     }
     base_data.update(data)
-    url = f"http://{const.IP}:{const.PORT}/{path}"
+    SERVER_HOST = conf().get("server_host")
+    url = f"http://{SERVER_HOST}/{path}"
     response = requests.post(url, json={"para": base_data}, timeout=5)
     return response.json()
 
@@ -31,16 +35,17 @@ def get_personal_info():
     try:
         response = fetch(path, data)
         content = json.loads(response["content"])
-        logger.info(
-            f"""
-                wechat login info:
-                
-                nickName: {content['wx_name']}
-                account: {content['wx_code']}
-                wechatId: {content['wx_id']}
-                startTime: {response['time']}
-                """
-        )
+        print(content)
+        # logger.info(
+        #     f"""
+        #         wechat login info:
+        #
+        #         nickName: {content['wx_name']}
+        #         account: {content['wx_code']}
+        #         wechatId: {content['wx_id']}
+        #         startTime: {response['time']}
+        #         """
+        # )
         return content
     except Exception as e:
         logger.error("Get personal info failed!")
@@ -74,6 +79,7 @@ def send_txt(msg, wx_id):
 
 
 def send_image(img_path, wx_id):
+    logger.info(f"图片路径：{img_path}")
     path = "api/sendpic"
     data = {
         "type": MessageType.PIC_MSG.value,
@@ -83,6 +89,7 @@ def send_image(img_path, wx_id):
     response = fetch(path, data)
     if response["status"] == const.SUCCESS:
         logger.info("image sent successfully")
+        threading.Timer(10, delete_file, args=[img_path]).start()
     else:
         logger.error(f"[Server Error]: {response.text}")
 
@@ -97,5 +104,16 @@ def send_file(file_path, wx_id):
     response = fetch(path, data)
     if response["status"] == const.SUCCESS:
         logger.info("file sent successfully")
+        threading.Timer(10, delete_file, args=[file_path]).start()
     else:
         logger.error(f"[Server Error]: {response.text}")
+
+
+def delete_file(file_path):
+    try:
+        os.remove(file_path)
+        print(f"文件 {file_path} 已被删除。")
+    except FileNotFoundError:
+        print(f"找不到文件 {file_path}，无法删除。")
+    except Exception as e:
+        print(f"删除文件时出错：{e}")

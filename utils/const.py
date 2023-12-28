@@ -1,9 +1,8 @@
 from enum import Enum
-
+from config import conf
 # server
-IP = "127.0.0.1"
-PORT = "5555"
-SERVER = f"ws://{IP}:{PORT}"
+SERVER_HOST = conf().get("server_host")
+SERVER = f"ws://{SERVER_HOST}"
 
 # "SUCCSESSED" should be a typo in the hook server😂
 SUCCESS = "SUCCSESSED"

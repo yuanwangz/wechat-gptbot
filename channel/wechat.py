@@ -41,6 +41,7 @@ class WeChatChannel(Channel):
         self.ws.run_forever()
 
     def on_message(self, ws, message):
+        print(message)
         raw_msg = json.loads(message)
         msg_type = raw_msg["type"]
         handlers = {

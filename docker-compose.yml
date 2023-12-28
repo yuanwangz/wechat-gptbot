@@ -1,0 +1,39 @@
+version: '3'
+
+services:
+  wechat-service:
+    image: henryxiaoyang/xybotwechat
+    container_name: wechat-service
+    volumes:
+      - ./assets:/home/app/upload
+      - ./assets/auto.dll:/home/app/.wine/drive_c/injector/auto.dll
+    ports:
+      - "51112:8080"
+      - "5555:5555"
+      - "5900:5900"
+    environment:
+      - HOOK_PROC_NAME=WeChat
+      - HOOK_DLL=auto.dll
+      - TARGET_AUTO_RESTART=yes
+      - INJ_CONDITION=[ "\`sudo netstat -tunlp | grep 5555\`" != '' ] && exit 0 ; sleep 5 ; curl 'http://127.0.0.1:8680/hi' 2>/dev/null | grep -P 'code.:0'
+      - TARGET_CMD=wechat-start
+    extra_hosts:
+      - "dldir1.qq.com:127.0.0.1"
+
+  wechat-gpt-hook:
+    image: wechat-gpt-hook:latest
+    container_name: wechat-gpt-hook
+    depends_on:
+      - wechat-service
+    command: >
+      sh -c "mkdir ./assets && cp ./assets/auto.dll /app/assets/auto.dll"
+    volumes:
+      - ./assets:/app/assets
+    environment:
+      - OPENAI_API_KEY=xxx
+      - OPENAI_API_BASE=xxxxx
+      - MODEL=gpt-4
+      - SERVER_HOST=xxxx
+      - CREATE_IMAGE_STYLE=natural
+      - SINGLE_CHAT_PREFIX=["bot","@bot"]
+      - ROLE_DESC=你是ChatGPT, 一个由OpenAI训练的大型语言模型, 你旨在回答并解决人们的任何问题，并且可以使用多种语言与人交流。

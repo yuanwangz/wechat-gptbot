@@ -6,7 +6,6 @@ from channel.message import Message
 from utils.log import logger
 from utils.const import MessageType
 from utils.gen import gen_id
-from config import conf
 
 
 def serialize_img(image_url: str) -> str:
@@ -32,7 +31,7 @@ def serialize_file(file_url: str, suffix: str) -> str:
                     f.write(chunk)
 
         # img_path = os.path.abspath(file_path)
-		img_path = conf().get("file_dir")+file_name
+		img_path = r"C:\\users\\app\\Pictures\\upload\\" + file_name
         return img_path
     except Exception as e:
         logger.error(f"[Download File Error]: {e}")

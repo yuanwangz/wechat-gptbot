@@ -30,8 +30,7 @@ def serialize_file(file_url: str, suffix: str) -> str:
                 if chunk:  # 过滤掉保持连接的新块
                     f.write(chunk)
 
-        # img_path = os.path.abspath(file_path)
-        img_path = r"C:\\users\\app\\Pictures\\upload\\" + file_name
+        img_path = os.path.abspath(file_path)
         return img_path
     except Exception as e:
         logger.error(f"[Download File Error]: {e}")

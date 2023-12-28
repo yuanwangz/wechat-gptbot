@@ -80,10 +80,12 @@ def send_txt(msg, wx_id):
 
 def send_image(img_path, wx_id):
     logger.info(f"图片路径：{img_path}")
+    file_name = os.path.basename(img_path)
+    send_path = r"C:\\users\\app\\Pictures\\upload\\" + file_name
     path = "api/sendpic"
     data = {
         "type": MessageType.PIC_MSG.value,
-        "content": img_path,
+        "content": send_path,
         "wxid": wx_id,
     }
     response = fetch(path, data)
@@ -95,10 +97,12 @@ def send_image(img_path, wx_id):
 
 
 def send_file(file_path, wx_id):
+    file_name = os.path.basename(file_path)
+    send_path = r"C:\\users\\app\\Pictures\\upload\\" + file_name
     path = "api/sendattatch"
     data = {
         "type": MessageType.ATTACH_FILE.value,
-        "content": file_path,
+        "content": send_path,
         "wxid": wx_id,
     }
     response = fetch(path, data)

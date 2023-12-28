@@ -22,7 +22,7 @@ echo "{
   \"single_chat_prefix\": ${SINGLE_CHAT_PREFIX:-[\"bot\", \"@bot\"]},
   \"query_key_command\": \"${QUERY_KEY_COMMAND:-#query key}\",
   \"recent_days\": ${RECENT_DAYS:-5},
-  \"plugins\": ${PLUGINS:-[{ \"name\": \"tiktok\", \"command\": \"#tiktok\" }]},
+  \"plugins\": [{ \"name\": \"tiktok\", \"command\": \"#tiktok\"}],
   \"openai_sensitive_id\": \"${OPENAI_SENSITIVE_ID:-}\",
   \"server_host\": \"${SERVER_HOST:-127.0.0.1:5555}\"
 }" > config.json

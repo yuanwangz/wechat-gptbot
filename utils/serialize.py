@@ -31,7 +31,7 @@ def serialize_file(file_url: str, suffix: str) -> str:
                     f.write(chunk)
 
         # img_path = os.path.abspath(file_path)
-		img_path = r"C:\\users\\app\\Pictures\\upload\\" + file_name
+        img_path = r"C:\\users\\app\\Pictures\\upload\\" + file_name
         return img_path
     except Exception as e:
         logger.error(f"[Download File Error]: {e}")

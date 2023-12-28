@@ -4,8 +4,8 @@ services:
   wechat-service:
     image: henryxiaoyang/xybotwechat
     container_name: wechat-service
-	depends_on:
-	  - wechat-gpt-hook
+    depends_on:
+      - wechat-gpt-hook
     volumes:
       - ./assets:/home/app/upload
       - ./assets/auto.dll:/home/app/.wine/drive_c/injector/auto.dll
@@ -37,4 +37,3 @@ services:
       - CREATE_IMAGE_STYLE=natural
       - SINGLE_CHAT_PREFIX=["bot","@bot"]
       - ROLE_DESC=你是ChatGPT, 一个由OpenAI训练的大型语言模型, 你旨在回答并解决人们的任何问题，并且可以使用多种语言与人交流。
-	  

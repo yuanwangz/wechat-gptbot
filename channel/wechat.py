@@ -235,7 +235,10 @@ class WeChatChannel(Channel):
 
     def on_open(self, ws):
         logger.info("[Websocket] connected")
-        self.personal_info = get_personal_info()
+        while True:
+            self.personal_info = get_personal_info()
+            if self.personal_info["wx_id"]:
+                break
 
     def on_close(self, ws, close_status_code, close_msg):
         logger.info("[Websocket] disconnected")

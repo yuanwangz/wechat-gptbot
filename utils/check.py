@@ -8,4 +8,4 @@ def check_prefix(content, prefix_list):
 def is_wx_account(id):
     if id is None:
         return False
-    return not id.lower().startswith("gh_")
+    return not (id.lower().startswith("gh_") or id == "newsapp")

@@ -1,4 +1,6 @@
 import json
+import threading
+import time
 import warnings
 import websocket
 from bs4 import BeautifulSoup
@@ -24,10 +26,31 @@ from channel.channel import Channel
 @singleton
 class WeChatChannel(Channel):
     def __init__(self):
+        self.personal_info = None
+        self.ws = None
+        self.ws_thread = None
         requests.packages.urllib3.disable_warnings()
         warnings.filterwarnings("ignore")
         os.environ["TF_CPP_MIN_LOG_LEVEL"] = "1"
-        self.personal_info = get_personal_info()
+        self.init_websocket()
+        # self.ws = websocket.WebSocketApp(
+        #     const.SERVER,
+        #     on_open=self.on_open,
+        #     on_message=self.on_message,
+        #     on_error=self.on_error,
+        #     on_close=self.on_close,
+        # )
+
+    def init_websocket(self):
+        try:
+            # 如果之前的线程存在，先关闭它
+            if self.ws_thread and self.ws:
+                self.ws.keep_running = False  # 通知线程停止
+                self.ws.close()
+                self.ws_thread.join()         # 等待线程结束
+        except Exception as e:
+            logger.error("ws_thread join failed!")
+
         self.ws = websocket.WebSocketApp(
             const.SERVER,
             on_open=self.on_open,
@@ -38,7 +61,8 @@ class WeChatChannel(Channel):
 
     def startup(self):
         logger.info("App startup successfully!")
-        self.ws.run_forever()
+        self.ws_thread = threading.Thread(target=self.ws.run_forever)
+        self.ws_thread.start()
 
     def on_message(self, ws, message):
         print(message)
@@ -144,11 +168,11 @@ class WeChatChannel(Channel):
             reply_text = reply.content
             if msg.is_group:
                 reply_text = (
-                    group_chat_reply_prefix + reply_text + group_chat_reply_suffix
+                        group_chat_reply_prefix + reply_text + group_chat_reply_suffix
                 )
             else:
                 reply_text = (
-                    single_chat_reply_prefix + reply_text + single_chat_reply_suffix
+                        single_chat_reply_prefix + reply_text + single_chat_reply_suffix
                 )
             reply.content = reply_text
         return reply
@@ -211,9 +235,18 @@ class WeChatChannel(Channel):
 
     def on_open(self, ws):
         logger.info("[Websocket] connected")
+        self.personal_info = get_personal_info()
 
-    def on_close(self, ws):
+    def on_close(self, ws, close_status_code, close_msg):
         logger.info("[Websocket] disconnected")
+        self.reconnect()
 
     def on_error(self, ws, error):
         logger.error(f"[Websocket] Error: {error}")
+
+    def reconnect(self):
+        # 等待一段时间后重连
+        time.sleep(10)  # 这里等待10秒
+        print("尝试重新连接...")
+        self.init_websocket()
+        self.startup()

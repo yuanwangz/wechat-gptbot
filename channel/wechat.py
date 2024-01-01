@@ -1,6 +1,7 @@
 import json
 import threading
 import time
+from datetime import datetime
 import warnings
 import websocket
 from bs4 import BeautifulSoup
@@ -67,6 +68,19 @@ class WeChatChannel(Channel):
     def on_message(self, ws, message):
         print(message)
         raw_msg = json.loads(message)
+        # 解析消息时间
+        msg_time_str = raw_msg.get("time", "")
+        msg_time = datetime.strptime(msg_time_str, "%Y-%m-%d %H:%M:%S")
+        current_time = datetime.now()
+
+        # 将消息时间和当前时间转换为时间戳
+        msg_timestamp = msg_time.timestamp()
+        current_timestamp = current_time.timestamp()
+
+        # 检查消息是否为历史消息（例如，如果消息时间比当前时间早1分钟）
+        if current_timestamp - msg_timestamp > 60:
+            logger.info("Ignoring historical message")
+            return
         msg_type = raw_msg["type"]
         handlers = {
             MessageType.AT_MSG.value: self.handle_message,
